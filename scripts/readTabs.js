@@ -1,4 +1,4 @@
-export async function getAllTabs() {
+export async function readTabs() {
   const tabs = await chrome.tabs.query({});
 
   return tabs.map(tab => ({
