@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
   const readTabsBtn = document.getElementById('readTabsBtn');
+  const duplicateTabsBtn= document.getElementById('duplicateTabsBtn');
 
   readTabsBtn.addEventListener('click', () => {
 
@@ -26,4 +27,29 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     );
   });
+
+    duplicateTabsBtn.addEventListener('click', () => {
+
+      chrome.runtime.sendMessage(
+        { action: "detectDuplicateTabs" },
+
+        (response) => {
+
+          const duplicateTabsList = document.getElementById('duplicateTabsList');
+
+          // Clear old list
+          duplicateTabsList.innerHTML = "";
+
+          response.duplicateTabs.forEach(tab => {
+
+            const li = document.createElement('li');
+
+            li.textContent = duplicateTabs.title;
+
+            duplicateTabsList.appendChild(li);
+
+          });
+        }
+      );
+    });
 });
