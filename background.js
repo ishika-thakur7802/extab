@@ -1,10 +1,10 @@
-import { readTabs } from './readTabs.js';
+import { readTabs } from './scripts/readTabs.js';
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
   if (request.action === "getTabs") {
 
-    getAllTabs().then((tabs) => {
+    readTabs().then((tabs) => {
       sendResponse({ tabs });
     });
 
