@@ -14,8 +14,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
    if (request.action === "detectDuplicateTabs") {
 
-      detectDuplicate().then((tabs) => {
-        sendResponse({ tabs });
+      detectDuplicate().then((duplicateTabs) => {
+        sendResponse({ duplicateTabs });
       });
 
       return true;

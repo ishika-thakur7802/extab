@@ -40,15 +40,23 @@ document.addEventListener('DOMContentLoaded', () => {
           // Clear old list
           duplicateTabsList.innerHTML = "";
 
-          response.duplicateTabs.forEach(tab => {
+          if (response.duplicateTabs.length === 0) {
 
-            const li = document.createElement('li');
+              const li = document.createElement('li');
+              li.textContent = "No duplicate tabs found";
+              duplicateTabsList.appendChild(li);
 
-            li.textContent = duplicateTabs.title;
+          } else {
 
-            duplicateTabsList.appendChild(li);
+              response.duplicateTabs.forEach(tab => {
 
-          });
+                  const li = document.createElement('li');
+                  li.textContent = tab.title;
+
+                  duplicateTabsList.appendChild(li);
+              });
+
+          }
         }
       );
     });
