@@ -34,9 +34,10 @@ document.addEventListener('DOMContentLoaded', () => {
         { action: "detectDuplicateTabs" },
 
         (response) => {
-
           const duplicateTabsList = document.getElementById('duplicateTabsList');
-
+          const duplicateCount = document.getElementById('duplicateCount');
+          duplicateCount.textContent =
+              `Duplicate tabs: ${response.duplicateTabs.length}`;
           // Clear old list
           duplicateTabsList.innerHTML = "";
 
@@ -47,7 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
               duplicateTabsList.appendChild(li);
 
           } else {
-
               response.duplicateTabs.forEach(tab => {
 
                   const li = document.createElement('li');
