@@ -11,7 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
       (response) => {
 
         const tabList = document.getElementById('tabList');
-
+        const tabCount = document.getElementById('tabCount');
+        tabCount.textContent =
+             `Number of Open Tabs: ${response.tabs.length}`;
         // Clear old list
         tabList.innerHTML = "";
 
