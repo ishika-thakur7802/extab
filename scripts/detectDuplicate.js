@@ -6,8 +6,9 @@ export async function detectDuplicate(){
         for (let j = i + 1; j < tabs.length; j++) {
             if (tabs[i].url === tabs[j].url) {
                  duplicateTabsList.push({
-                     title: tabs[i].title,
-                     url: tabs[i].url
+                     title: tabs[j].title,
+                     id: tabs[j].id;
+                     url: tabs[j].url
                  });
             }
         }

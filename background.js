@@ -1,5 +1,6 @@
 import { readTabs } from './scripts/readTabs.js';
 import { detectDuplicate } from './scripts/detectDuplicate.js';
+import { closeDuplicateTabs } from './scripts/closeDuplicateTabs.js';
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
@@ -20,4 +21,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
       return true;
     }
+
+   if (request.action === "closeDuplicateTabs") {
+
+        closeDuplicateTabs().then((duplicateTabs) => {
+          sendResponse({ duplicateTabs });
+        });
+
+        return true;
+      }
+
+
 });

@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-
+  let deleteDuplicateBtn;
   const readTabsBtn = document.getElementById('readTabsBtn');
   const duplicateTabsBtn= document.getElementById('duplicateTabsBtn');
 
@@ -50,16 +50,32 @@ document.addEventListener('DOMContentLoaded', () => {
               duplicateTabsList.appendChild(li);
 
           } else {
+              deleteDuplicateBtn= document.createElement('button');
+              deleteDuplicateBtn.textContent = "Delete Duplicate Tabs"
+              duplicateTabsList.appendChild(deleteDuplicateBtn);
               response.duplicateTabs.forEach(tab => {
 
                   const li = document.createElement('li');
                   li.textContent = tab.title;
 
-                  duplicateTabsList.appendChild(li);
+
+                duplicateTabsList.appendChild(li);
               });
 
           }
         }
       );
     });
+
+     deleteDuplicateBtn.addEventListener('click', () => {
+
+        chrome.runtime.sendMessage(
+          { action: "closeDuplicateTabs" },
+
+          (response) => {
+
+            const deleteCount = document.getElementById('deleteCount');
+            deleteCount.textContent = `Duplicate Tabs Deleted: ${response.duplicateTabs.length}`;         }
+        );
+      });
 });
