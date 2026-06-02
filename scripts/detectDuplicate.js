@@ -7,7 +7,7 @@ export async function detectDuplicate(){
             if (tabs[i].url === tabs[j].url) {
                  duplicateTabsList.push({
                      title: tabs[j].title,
-                     id: tabs[j].id;
+                     id: tabs[j].id,
                      url: tabs[j].url
                  });
             }
