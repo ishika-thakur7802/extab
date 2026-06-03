@@ -52,6 +52,17 @@ document.addEventListener('DOMContentLoaded', () => {
               const deleteDuplicateBtn= document.createElement('button');
               deleteDuplicateBtn.textContent = "Delete Duplicate Tabs"
               duplicateTabsList.appendChild(deleteDuplicateBtn);
+              deleteDuplicateBtn.addEventListener('click', () => {
+
+                      chrome.runtime.sendMessage(
+                        { action: "closeDuplicateTabs" },
+
+                        (response) => {
+
+                          const deleteCount = document.getElementById('deleteCount');
+                          deleteCount.textContent = `Duplicate Tabs Deleted: ${response.duplicateTabs.length}`;         }
+                      );
+                    });
               response.duplicateTabs.forEach(tab => {
 
                   const li = document.createElement('li');
@@ -66,15 +77,5 @@ document.addEventListener('DOMContentLoaded', () => {
       );
     });
 
-     deleteDuplicateBtn.addEventListener('click', () => {
 
-        chrome.runtime.sendMessage(
-          { action: "closeDuplicateTabs" },
-
-          (response) => {
-
-            const deleteCount = document.getElementById('deleteCount');
-            deleteCount.textContent = `Duplicate Tabs Deleted: ${response.duplicateTabs.length}`;         }
-        );
-      });
 });
