@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-  let deleteDuplicateBtn;
   const readTabsBtn = document.getElementById('readTabsBtn');
   const duplicateTabsBtn= document.getElementById('duplicateTabsBtn');
 
@@ -50,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
               duplicateTabsList.appendChild(li);
 
           } else {
-              deleteDuplicateBtn= document.createElement('button');
+              const deleteDuplicateBtn= document.createElement('button');
               deleteDuplicateBtn.textContent = "Delete Duplicate Tabs"
               duplicateTabsList.appendChild(deleteDuplicateBtn);
               response.duplicateTabs.forEach(tab => {
