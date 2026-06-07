@@ -1,4 +1,4 @@
-export async function trackTabActivity() {
+export function initTabActivityTracking() {
   // Listen for tab activation (when user switches to a tab)
   chrome.tabs.onActivated.addListener((activeInfo) => {
     const { tabId } = activeInfo;
@@ -35,7 +35,7 @@ export async function trackTabActivity() {
         chrome.tabs.onRemoved.addListener((tabId) => {
           chrome.storage.local.remove(String(tabId));
         });
-      }
+      });
 
       // Get all tracked tabs from storage
       export async function getTrackedTabs() {
