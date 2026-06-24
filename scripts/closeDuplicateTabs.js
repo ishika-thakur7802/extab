@@ -4,7 +4,7 @@ export async function closeDuplicateTabs(){
     const duplicateTabs = await detectDuplicate();
     if(duplicateTabs.length > 0){
         for(const tab of duplicateTabs){
-            await chrome.tabs.remove(tab.id);
+            chrome.tabs.remove(tab.id);
         }
     }
 
