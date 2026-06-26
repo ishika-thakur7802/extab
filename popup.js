@@ -1,10 +1,9 @@
-// popup.js
 document.addEventListener('DOMContentLoaded', () => {
   const readTabsBtn = document.getElementById('readTabsBtn');
   const duplicateTabsBtn = document.getElementById('duplicateTabsBtn');
-  const staleTabsBtn= document.getElementById('staleTabsBtn'`);
-  // Defensive: ensure required DOM nodes exist
+  const staleTabsBtn= document.getElementById('staleTabsBtn');
   const tabList = document.getElementById('tabList');
+
   const tabCount = document.getElementById('tabCount');
   const duplicateTabsList = document.getElementById('duplicateTabsList');
   const duplicateCount = document.getElementById('duplicateCount');
@@ -12,8 +11,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const staleCount= document.getElementById('staleCount');
   const staleTabsList= document.getElementById('staleTabsList');
 
-  if (!readTabsBtn || !duplicateTabsBtn || !tabList || !tabCount || !duplicateTabsList || !duplicateCount || !deleteCount || !staleCount) {
-    console.error('Popup missing required elements', { readTabsBtn, duplicateTabsBtn, tabList, tabCount, duplicateTabsList, duplicateCount, deleteCount, staleCount });
+  if (!readTabsBtn || !duplicateTabsBtn || !staleTabsBtn) {
+    console.error('Popup missing required elements');
     return;
   }
 
@@ -23,18 +22,18 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.runtime.sendMessage({ action: 'getTabs' }, (response) => {
       if (!response || !Array.isArray(response.tabs)) {
         console.error('No tabs response from background', chrome.runtime.lastError, response);
-        tabCount.textContent = 'Error reading tabs';
-        tabList.innerHTML = '';
+        if(tabCount) tabCount.textContent = 'Error reading tabs';
+        if(tabList) tabList.innerHTML = '';
         return;
       }
 
-      tabCount.textContent = `Number of Open Tabs: ${response.tabs.length}`;
-      tabList.innerHTML = '';
+      if (tabCount) tabCount.textContent = `Number of Open Tabs: ${response.tabs.length}`;
+      if (tabList) tabList.innerHTML = '';
 
       response.tabs.forEach(tab => {
         const li = document.createElement('li');
         li.textContent = tab.title || tab.url || '(no title)';
-        tabList.appendChild(li);
+        if (tabList) tabList.appendChild(li);
       });
     });
   });
@@ -91,22 +90,29 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   staleTabsBtn.addEventListener('click', ()=>{
-    if (!response || !Array.isArray(response.staleTabs)) {
-            console.error('No tabs response from background', chrome.runtime.lastError, response);
-            tabCount.textContent = 'Error reading tabs';
-            tabList.innerHTML = '';
-            return;
-          }
-  	chrome.runtime.sendMessage({action: 'getStaleTabs'}, (response)=>{
-  		staleCount.textContent= 'Number of Stale Tabs: ${response.staleTabs.length}';
-  		staleTabsList.innerHTML = ' ';
+    chrome.runtime.sendMessage({action: 'getStaleTabs'}, (response)=>{
 
-                 if (response.staleTabs.length === 0) {
-                   const li = document.createElement('li');
-                   li.textContent = 'No Idle tabs found';
-  			return;
+      if (!response || !Array.isArray(response.staleTabs)) {
+              console.error('No tabs response from background', chrome.runtime.lastError, response);
+              staleCount.textContent = 'Error reading tabs';
+              staleTabsList.innerHTML = '';
+              return;
+            }
+    		staleCount.textContent= `Number of Idle Tabs: ${response.staleTabs.length}`;
+    		staleTabsList.innerHTML = '';
 
-  }
-  });
-  });
+                   if (response.staleTabs.length === 0) {
+                     const li = document.createElement('li');
+                     li.textContent = 'No Idle tabs found';
+                     staleTabsList.appendChild(li);
+    			return;
+   }
+  response.staleTabs.forEach(tab=>{
+
+  	const li= document.createElement('li');
+  	li.textContent= tab.title || tab.url || '(no title)';
+  	staleTabsList.appendChild(li);
+    });
+    });
+});
 });

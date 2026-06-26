@@ -2,8 +2,7 @@ import { readTabs } from './scripts/readTabs.js';
 import { detectDuplicate } from './scripts/detectDuplicate.js';
 import { closeDuplicateTabs } from './scripts/closeDuplicateTabs.js';
 import { detectStaleTabs } from './scripts/detectStaleTabs.js';
-//import { getIdleTabs } from './scripts/detectStaleTabs.js';
-//import { initTabActivityTracking } from './scripts/trackTabActivity.js';
+
 
 //initTabActivityTracking();
 
