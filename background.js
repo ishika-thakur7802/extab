@@ -1,6 +1,7 @@
 import { readTabs } from './scripts/readTabs.js';
 import { detectDuplicate } from './scripts/detectDuplicate.js';
 import { closeDuplicateTabs } from './scripts/closeDuplicateTabs.js';
+import { detectStaleTabs } from './scripts/detectStaleTabs.js';
 //import { getIdleTabs } from './scripts/detectStaleTabs.js';
 //import { initTabActivityTracking } from './scripts/trackTabActivity.js';
 
@@ -62,12 +63,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
         return true;
       }
-//   if (request.action === "getIdleTabs") {
-//        getIdleTabs().then((idleTabs) => {
-//          sendResponse({ idleTabs });
-//        });
-//        return true;
-//      }
+
+  if(request.action === "getStaleTabs"){
+
+       detectStaleTabs().then((staleTabs)=>{
+ 	      sendResponse({staleTabs});
+      });
+
+ return true;
+ }
 
 
 });

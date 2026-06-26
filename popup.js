@@ -2,18 +2,22 @@
 document.addEventListener('DOMContentLoaded', () => {
   const readTabsBtn = document.getElementById('readTabsBtn');
   const duplicateTabsBtn = document.getElementById('duplicateTabsBtn');
-
+  const staleTabsBtn= document.getElementById('staleTabsBtn'`);
   // Defensive: ensure required DOM nodes exist
   const tabList = document.getElementById('tabList');
   const tabCount = document.getElementById('tabCount');
   const duplicateTabsList = document.getElementById('duplicateTabsList');
   const duplicateCount = document.getElementById('duplicateCount');
   const deleteCount = document.getElementById('deleteCount');
+  const staleCount= document.getElementById('staleCount');
+  const staleTabsList= document.getElementById('staleTabsList');
 
-  if (!readTabsBtn || !duplicateTabsBtn || !tabList || !tabCount || !duplicateTabsList || !duplicateCount || !deleteCount) {
-    console.error('Popup missing required elements', { readTabsBtn, duplicateTabsBtn, tabList, tabCount, duplicateTabsList, duplicateCount, deleteCount });
+  if (!readTabsBtn || !duplicateTabsBtn || !tabList || !tabCount || !duplicateTabsList || !duplicateCount || !deleteCount || !staleCount) {
+    console.error('Popup missing required elements', { readTabsBtn, duplicateTabsBtn, tabList, tabCount, duplicateTabsList, duplicateCount, deleteCount, staleCount });
     return;
   }
+
+
 
   readTabsBtn.addEventListener('click', () => {
     chrome.runtime.sendMessage({ action: 'getTabs' }, (response) => {
@@ -59,17 +63,17 @@ document.addEventListener('DOMContentLoaded', () => {
       const deleteDuplicateBtn = document.createElement('button');
       deleteDuplicateBtn.textContent = 'Delete Duplicate Tabs';
       deleteDuplicateBtn.addEventListener('click', () => {
-        chrome.runtime.sendMessage({ action: 'closeDuplicateTabs' }, (closeResp) => {
-          if (!closeResp || !Array.isArray(closeResp.duplicateTabs)) {
-            console.error('No closeDuplicateTabs response', chrome.runtime.lastError, closeResp);
+        chrome.runtime.sendMessage({ action: 'closeDuplicateTabs' }, (response) => {
+          if (!response || !Array.isArray(response.duplicateTabs)) {
+            console.error('No closeDuplicateTabs response', chrome.runtime.lastError, response);
             deleteCount.textContent = 'Error deleting duplicates';
             return;
           }
-          deleteCount.textContent = `Duplicate Tabs Deleted: ${closeResp.duplicateTabs.length}`;
+          deleteCount.textContent = `Duplicate Tabs Deleted: ${response.duplicateTabs.length}`;
           // Refresh duplicate list UI
           duplicateTabsList.innerHTML = '';
           const li = document.createElement('li');
-          li.textContent = `Closed ${closeResp.duplicateTabs.length} tabs`;
+          li.textContent = `Closed ${response.duplicateTabs.length} tabs`;
           duplicateTabsList.appendChild(li);
         });
       });
@@ -81,6 +85,28 @@ document.addEventListener('DOMContentLoaded', () => {
         li.textContent = tab.title || tab.url || '(no title)';
         duplicateTabsList.appendChild(li);
       });
+
+
     });
+  });
+
+  staleTabsBtn.addEventListener('click', ()=>{
+    if (!response || !Array.isArray(response.staleTabs)) {
+            console.error('No tabs response from background', chrome.runtime.lastError, response);
+            tabCount.textContent = 'Error reading tabs';
+            tabList.innerHTML = '';
+            return;
+          }
+  	chrome.runtime.sendMessage({action: 'getStaleTabs'}, (response)=>{
+  		staleCount.textContent= 'Number of Stale Tabs: ${response.staleTabs.length}';
+  		staleTabsList.innerHTML = ' ';
+
+                 if (response.staleTabs.length === 0) {
+                   const li = document.createElement('li');
+                   li.textContent = 'No Idle tabs found';
+  			return;
+
+  }
+  });
   });
 });
