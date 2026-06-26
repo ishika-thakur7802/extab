@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   	const li= document.createElement('li');
   	const title= tab.title || tab.url || '(no title)';
-  	li.textContent= li.textContent = `${title} - Idle for ${Math.floor(tab.idleTime / 3600000)} hours`;
+  	li.textContent= li.textContent = `${title} - Idle for ${Math.floor(tab.idleTime / 86400000)} days ${Math.floor((tab.idleTime % 86400000) / 3600000)} hours`;
   	staleTabsList.appendChild(li);
     });
     });
