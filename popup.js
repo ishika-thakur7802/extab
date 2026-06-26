@@ -110,7 +110,8 @@ document.addEventListener('DOMContentLoaded', () => {
   response.staleTabs.forEach(tab=>{
 
   	const li= document.createElement('li');
-  	li.textContent= tab.title || tab.url || '(no title)';
+  	const title= tab.title || tab.url || '(no title)';
+  	li.textContent= li.textContent = `${title} - Idle for ${Math.floor(tab.idleTime / 3600000)} hours`;
   	staleTabsList.appendChild(li);
     });
     });
