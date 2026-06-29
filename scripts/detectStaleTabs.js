@@ -3,7 +3,7 @@ export async function detectStaleTabs(){
 	const staleTabsList = [];
     const currentTime = Date.now();
 	for(let i=0; i<tabs.length; i++){
-	    if((currentTime - tabs[i].lastAccessed) > 7200000){
+	    if((currentTime - tabs[i].lastAccessed) > 14400000){
 	       const idleTime = currentTime - tabs[i].lastAccessed;
 
 		   staleTabsList.push({

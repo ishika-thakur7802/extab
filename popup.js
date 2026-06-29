@@ -38,6 +38,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+//  readTabsBtn.addEventListener('dblclick', () => {
+//    tabList.innerHTML = '';
+//    tabCount.textContent = '';
+//  }
+
   duplicateTabsBtn.addEventListener('click', () => {
     chrome.runtime.sendMessage({ action: 'detectDuplicateTabs' }, (response) => {
       if (!response || !Array.isArray(response.duplicateTabs)) {
