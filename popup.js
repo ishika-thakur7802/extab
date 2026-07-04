@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const duplicateCount = document.getElementById('duplicateCount');
   const deleteCount = document.getElementById('deleteCount');
   const staleCount= document.getElementById('staleCount');
-  const staleTabsList= document.getElementById('staleTabsList');
+  const staleCardContainer = document.getElementById("staleCardContainer");
 
   if (!readTabsBtn || !duplicateTabsBtn || !staleTabsBtn) {
     console.error('Popup missing required elements');
@@ -93,32 +93,51 @@ document.addEventListener('DOMContentLoaded', () => {
 
     });
   });
+  function displayCard(tab) {
+    const hours = Math.floor(tab.idleTime / 3600000);
+    const minutes = Math.floor((tab.idleTime % 3600000) / 60000);
+    staleCardContainer.innerHTML = `
+    <div class="tab-card">
 
+        <h3>${tab.title}</h3>
+
+        <p>${new URL(tab.url).hostname}</p>
+
+        <p>Idle for ${hours}h ${minutes}m</p>
+
+
+    </div>
+    `;
+  }
   staleTabsBtn.addEventListener('click', ()=>{
     chrome.runtime.sendMessage({action: 'getStaleTabs'}, (response)=>{
 
       if (!response || !Array.isArray(response.staleTabs)) {
               console.error('No tabs response from background', chrome.runtime.lastError, response);
               staleCount.textContent = 'Error reading tabs';
-              staleTabsList.innerHTML = '';
+              staleCardContainer.innerHTML = '';
               return;
             }
     		staleCount.textContent= `Number of Idle Tabs: ${response.staleTabs.length}`;
-    		staleTabsList.innerHTML = '';
+    		staleCardContainer.innerHTML = '';
 
-                   if (response.staleTabs.length === 0) {
-                     const li = document.createElement('li');
-                     li.textContent = 'No Idle tabs found';
-                     staleTabsList.appendChild(li);
-    			return;
-   }
-  response.staleTabs.forEach(tab=>{
+                  if (response.staleTabs.length === 0) {
+                      staleCardContainer.innerHTML = `
+                          <div class="tab-card">
+                              <h3>🎉 No Idle Tabs</h3>
+                              <p>Your tabs are nice and clean.</p>
+                          </div>
+                      `;
+                      return;
+                  }
 
-  	const li= document.createElement('li');
-  	const title= tab.title || tab.url || '(no title)';
-  	li.textContent= li.textContent = `${title} - Idle for ${Math.floor(tab.idleTime / 86400000)} days ${Math.floor((tab.idleTime % 86400000) / 3600000)} hours`;
-  	staleTabsList.appendChild(li);
-    });
+        displayCard(response.staleTabs[0]);
+
+//  	const li= document.createElement('li');
+//  	const title= tab.title || tab.url || '(no title)';
+//  	li.textContent= li.textContent = `${title} - Idle for ${Math.floor(tab.idleTime / 86400000)} days ${Math.floor((tab.idleTime % 86400000) / 3600000)} hours`;
+//  	staleTabsList.appendChild(li);
+
     });
 });
 });
