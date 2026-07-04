@@ -114,6 +114,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     </div>
     `;
+    previousBtn.disabled = currentIndex === 0;
+
+    nextBtn.disabled = currentIndex === staleTabs.length - 1;
   }
 
   nextBtn.addEventListener("click", () => {
