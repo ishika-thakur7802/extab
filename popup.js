@@ -11,6 +11,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const staleCount= document.getElementById('staleCount');
   const staleCardContainer = document.getElementById("staleCardContainer");
 
+  const previousBtn = document.getElementById("previousBtn");
+  const nextBtn = document.getElementById("nextBtn");
+
+  let staleTabs = [];
+  let currentIndex = 0;
+
   if (!readTabsBtn || !duplicateTabsBtn || !staleTabsBtn) {
     console.error('Popup missing required elements');
     return;
@@ -109,6 +115,25 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
     `;
   }
+
+  nextBtn.addEventListener("click", () => {
+
+      if (currentIndex < staleTabs.length - 1) {
+          currentIndex++;
+          displayCard(staleTabs[currentIndex]);
+      }
+
+  });
+
+  previousBtn.addEventListener("click", () => {
+
+      if (currentIndex > 0) {
+          currentIndex--;
+          displayCard(staleTabs[currentIndex]);
+      }
+
+  });
+
   staleTabsBtn.addEventListener('click', ()=>{
     chrome.runtime.sendMessage({action: 'getStaleTabs'}, (response)=>{
 
@@ -131,7 +156,10 @@ document.addEventListener('DOMContentLoaded', () => {
                       return;
                   }
 
-        displayCard(response.staleTabs[0]);
+    staleTabs = response.staleTabs;
+    currentIndex = 0;
+
+    displayCard(staleTabs[currentIndex]);
 
 //  	const li= document.createElement('li');
 //  	const title= tab.title || tab.url || '(no title)';
