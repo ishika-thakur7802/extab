@@ -35,11 +35,11 @@ button {
   transition: all 0.2s ease;
 }
 
-button:hover {
+button:not(.arrow-btn):hover {
   background: #1d4ed8;
 }
 
-button:active {
+button:not(.arrow-btn):active {
   transform: scale(0.98);
 }
 
@@ -104,17 +104,62 @@ h3 {
   border: 1px solid #1e293b;
 }
 
-.navigation {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
+
+
+
+#progressContainer{
+    margin:15px 0;
 }
 
-.navigation button {
-    flex: 1;
+#progressText{
+    text-align:center;
+    margin-bottom:8px;
+    font-weight:600;
 }
 
-.navigation button:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
+.progress-bar{
+    width:100%;
+    height:10px;
+    background:#d9d9d9;
+    border-radius:999px;
+    overflow:hidden;
+}
+
+#progressFill{
+    width:0%;
+    height:100%;
+    background:#2563eb;
+    transition:width .3s ease;
+}
+
+.card-nav{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:16px;
+}
+
+.arrow-btn{
+    background:none;
+    border:none;
+    font-size:22px;
+    cursor:pointer;
+    padding:6px 10px;
+    color:#555;
+    transition:0.2s;
+}
+
+.arrow-btn:hover:not(:disabled){
+    transform:scale(1.15);
+}
+
+.arrow-btn:disabled{
+    cursor:default;
+    opacity:0;
+}
+
+
+.arrow-btn:focus-visible{
+    outline:2px solid #2563eb;
+    outline-offset:2px;
+    border-radius:50%;
 }

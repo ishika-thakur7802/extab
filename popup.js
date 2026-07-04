@@ -10,12 +10,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const deleteCount = document.getElementById('deleteCount');
   const staleCount= document.getElementById('staleCount');
   const staleCardContainer = document.getElementById("staleCardContainer");
+  const progressText= document.getElementById('progressText');
+  const progressFill = document.getElementById("progressFill");
+  const progressContainer= document.getElementById("progressContainer");
+
 
 
   let staleTabs = [];
   let currentIndex = 0;
-  let nextBtn = null;
-  let previousBtn = null;
+  progressContainer.style.display = "none";
   if (!readTabsBtn || !duplicateTabsBtn || !staleTabsBtn) {
     console.error('Popup missing required elements');
     return;
@@ -101,8 +104,17 @@ document.addEventListener('DOMContentLoaded', () => {
   function displayCard(tab) {
     const hours = Math.floor(tab.idleTime / 3600000);
     const minutes = Math.floor((tab.idleTime % 3600000) / 60000);
+    progressText.textContent =
+    `${currentIndex + 1} / ${staleTabs.length}`;
+    const progress =
+    ((currentIndex + 1) / staleTabs.length) * 100;
+    progressFill.style.width = `${progress}%`;
     staleCardContainer.innerHTML = `
     <div class="tab-card">
+        <div class="card-nav">
+                <button id="previousBtn" class="arrow-btn">❮</button>
+                <button id="nextBtn" class="arrow-btn">❯</button>
+            </div>
 
         <h3>${tab.title}</h3>
 
@@ -110,12 +122,60 @@ document.addEventListener('DOMContentLoaded', () => {
 
         <p>Idle for ${hours}h ${minutes}m</p>
 
+         <button id="switchBtn">
+                Switch To Tab
+            </button>
+
+            <button id="reviewBtn">
+                Review Tab
+            </button>
+
+            <button id="closeBtn">
+                Close Tab
+            </button>
 
     </div>
     `;
+    const previousBtn = document.getElementById("previousBtn");
+
+    const nextBtn = document.getElementById("nextBtn");
+
+    const switchBtn = document.getElementById("switchBtn");
+
+    const reviewBtn = document.getElementById("reviewBtn");
+
+    const closeBtn = document.getElementById("closeBtn");
+
     previousBtn.disabled = currentIndex === 0;
 
     nextBtn.disabled = currentIndex === staleTabs.length - 1;
+
+     nextBtn.addEventListener("click", () => {
+
+                      if (currentIndex < staleTabs.length - 1) {
+                          currentIndex++;
+                          displayCard(staleTabs[currentIndex]);
+                      }
+
+                  });
+
+
+     previousBtn.addEventListener("click", () => {
+
+                      if (currentIndex > 0) {
+                          currentIndex--;
+                          displayCard(staleTabs[currentIndex]);
+                      }
+
+                  });
+
+     switchBtn.onclick = () => {
+
+         chrome.tabs.update(tab.id,{
+             active:true
+         });
+
+     };
   }
 
 
@@ -131,36 +191,12 @@ document.addEventListener('DOMContentLoaded', () => {
               staleCardContainer.innerHTML = '';
               return;
             }
-            const navigation = document.createElement("div");
-            navigation.className = "navigation";
-            nextBtn = document.createElement('button');
-            nextBtn.textContent = 'Next';
-            nextBtn.addEventListener("click", () => {
-
-                  if (currentIndex < staleTabs.length - 1) {
-                      currentIndex++;
-                      displayCard(staleTabs[currentIndex]);
-                  }
-
-              });
-            previousBtn = document.createElement('button');
-            previousBtn.textContent = 'Previous';
-
-             previousBtn.addEventListener("click", () => {
-
-                  if (currentIndex > 0) {
-                      currentIndex--;
-                      displayCard(staleTabs[currentIndex]);
-                  }
-
-              });
-            navigation.appendChild(previousBtn);
-            navigation.appendChild(nextBtn);
     		staleCount.textContent= `Number of Idle Tabs: ${response.staleTabs.length}`;
     		staleCardContainer.innerHTML = '';
 
                   if (response.staleTabs.length === 0) {
-                      staleCardContainer.innerHTML = `
+                    progressContainer.style.display = "none";
+                    staleCardContainer.innerHTML = `
                           <div class="tab-card">
                               <h3>🎉 No Idle Tabs</h3>
                               <p>Your tabs are nice and clean.</p>
@@ -171,9 +207,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     staleTabs = response.staleTabs;
     currentIndex = 0;
-
+    progressContainer.style.display = "block";
     displayCard(staleTabs[currentIndex]);
-    staleCardContainer.after(navigation);
 
 //  	const li= document.createElement('li');
 //  	const title= tab.title || tab.url || '(no title)';
