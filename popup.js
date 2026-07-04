@@ -11,12 +11,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const staleCount= document.getElementById('staleCount');
   const staleCardContainer = document.getElementById("staleCardContainer");
 
-  const previousBtn = document.getElementById("previousBtn");
-  const nextBtn = document.getElementById("nextBtn");
 
   let staleTabs = [];
   let currentIndex = 0;
-
+  let nextBtn = null;
+  let previousBtn = null;
   if (!readTabsBtn || !duplicateTabsBtn || !staleTabsBtn) {
     console.error('Popup missing required elements');
     return;
@@ -69,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // Create delete button and attach listener right after creation
+      // Create delete button
       const deleteDuplicateBtn = document.createElement('button');
       deleteDuplicateBtn.textContent = 'Delete Duplicate Tabs';
       deleteDuplicateBtn.addEventListener('click', () => {
@@ -119,23 +118,9 @@ document.addEventListener('DOMContentLoaded', () => {
     nextBtn.disabled = currentIndex === staleTabs.length - 1;
   }
 
-  nextBtn.addEventListener("click", () => {
 
-      if (currentIndex < staleTabs.length - 1) {
-          currentIndex++;
-          displayCard(staleTabs[currentIndex]);
-      }
 
-  });
 
-  previousBtn.addEventListener("click", () => {
-
-      if (currentIndex > 0) {
-          currentIndex--;
-          displayCard(staleTabs[currentIndex]);
-      }
-
-  });
 
   staleTabsBtn.addEventListener('click', ()=>{
     chrome.runtime.sendMessage({action: 'getStaleTabs'}, (response)=>{
@@ -146,6 +131,31 @@ document.addEventListener('DOMContentLoaded', () => {
               staleCardContainer.innerHTML = '';
               return;
             }
+            const navigation = document.createElement("div");
+            navigation.className = "navigation";
+            nextBtn = document.createElement('button');
+            nextBtn.textContent = 'Next';
+            nextBtn.addEventListener("click", () => {
+
+                  if (currentIndex < staleTabs.length - 1) {
+                      currentIndex++;
+                      displayCard(staleTabs[currentIndex]);
+                  }
+
+              });
+            previousBtn = document.createElement('button');
+            previousBtn.textContent = 'Previous';
+
+             previousBtn.addEventListener("click", () => {
+
+                  if (currentIndex > 0) {
+                      currentIndex--;
+                      displayCard(staleTabs[currentIndex]);
+                  }
+
+              });
+            navigation.appendChild(previousBtn);
+            navigation.appendChild(nextBtn);
     		staleCount.textContent= `Number of Idle Tabs: ${response.staleTabs.length}`;
     		staleCardContainer.innerHTML = '';
 
@@ -163,6 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
     currentIndex = 0;
 
     displayCard(staleTabs[currentIndex]);
+    staleCardContainer.after(navigation);
 
 //  	const li= document.createElement('li');
 //  	const title= tab.title || tab.url || '(no title)';
