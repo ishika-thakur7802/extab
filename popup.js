@@ -176,6 +176,33 @@ document.addEventListener('DOMContentLoaded', () => {
          });
 
      };
+
+     closeBtn.onclick = () => {
+
+         chrome.tabs.remove(tab.id);
+
+         staleTabs.splice(currentIndex, 1);
+
+         if (staleTabs.length === 0) {
+
+             progressContainer.style.display = "none";
+
+             staleCardContainer.innerHTML = `
+                 <div class="tab-card">
+                     <h3>🎉 All idle tabs reviewed!</h3>
+                     <p>No idle tabs left.</p>
+                 </div>
+             `;
+
+             return;
+         }
+
+         if (currentIndex >= staleTabs.length) {
+             currentIndex = staleTabs.length - 1;
+         }
+
+         displayCard(staleTabs[currentIndex]);
+     };
   }
 
 
