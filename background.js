@@ -4,6 +4,7 @@ import { closeDuplicateTabs } from './scripts/closeDuplicateTabs.js';
 import { detectStaleTabs } from './scripts/detectStaleTabs.js';
 
 
+
 //initTabActivityTracking();
 
 //// Set up alarm to check for idle tabs every 5 minutes
