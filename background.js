@@ -73,5 +73,34 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
  return true;
  }
 
+ if (request.action === "reviewTab") {
+
+     chrome.scripting.executeScript(
+         {
+             target: {
+                 tabId: request.tabId
+             },
+             files: ["content.js"]
+         },
+         () => {
+
+             chrome.tabs.sendMessage(
+                 request.tabId,
+                 {
+                     action: "extractPage"
+                 },
+                 (response) => {
+
+                     sendResponse(response);
+
+                 }
+             );
+
+         }
+     );
+
+     return true;
+ }
+
 
 });

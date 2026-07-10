@@ -101,24 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     });
   });
-  async function reviewTab(tab) {
 
-      chrome.tabs.sendMessage(
-          tab.id,
-          { action: "extractPage" },
-          (response) => {
-
-              if (chrome.runtime.lastError) {
-                  console.error(chrome.runtime.lastError.message);
-                  return;
-              }
-
-              console.log(response.text);
-
-          }
-      );
-
-  }
   function displayCard(tab) {
     const hours = Math.floor(tab.idleTime / 3600000);
     const minutes = Math.floor((tab.idleTime % 3600000) / 60000);
@@ -194,12 +177,21 @@ document.addEventListener('DOMContentLoaded', () => {
          });
 
      };
-     reviewBtn.onclick = () => {
+  reviewBtn.onclick = () => {
 
-         reviewTab(tab);
+      chrome.runtime.sendMessage(
+          {
+              action: "reviewTab",
+              tabId: tab.id
+          },
+          (response) => {
 
-     };
+              console.log(response.text);
 
+          }
+      );
+
+  };
      closeBtn.onclick = () => {
 
          chrome.tabs.remove(tab.id);
