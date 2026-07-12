@@ -5,7 +5,7 @@
 }
 
 body {
-  width: 360px;
+  width:420px;
   min-height: 500px;
   padding: 18px;
   font-family: Inter, Arial, sans-serif;
@@ -21,18 +21,19 @@ h1 {
   color: #60a5fa;
 }
 
-button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  border: none;
-  border-radius: 10px;
-  background: #2563eb;
-  color: white;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
+
+button{
+
+    border-radius:12px;
+
+    background:#2563eb;
+
+    padding:11px;
+
+    font-weight:600;
+
+    box-shadow:
+    0 6px 20px rgba(37,99,235,.25);
 }
 
 button:not(.arrow-btn):hover {
@@ -96,17 +97,23 @@ h3 {
   background: transparent;
 }
 
-.section {
-  background: #111827;
-  border-radius: 12px;
-  padding: 14px;
-  margin-bottom: 16px;
-  border: 1px solid #1e293b;
+.section{
+    background:#111827;
+    border:1px solid #263245;
+    border-radius:18px;
+    padding:18px;
+    margin-bottom:18px;
 }
 
 
 
-
+.subtitle{
+    text-align:center;
+    color:#94a3b8;
+    margin-top:-12px;
+    margin-bottom:22px;
+    font-size:13px;
+}
 #progressContainer{
     margin:15px 0;
 }
@@ -157,9 +164,34 @@ h3 {
     opacity:0;
 }
 
+.progress-bar{
 
+height:7px;
+
+background:#1e293b;
+}
+
+#progressFill{
+
+background:linear-gradient(
+90deg,
+#60a5fa,
+#2563eb
+);
+}
 .arrow-btn:focus-visible{
     outline:2px solid #2563eb;
     outline-offset:2px;
     border-radius:50%;
+}
+#switchBtn{
+background:#2563eb;
+}
+
+#reviewBtn{
+background: #D3D3D3;
+}
+
+#closeBtn{
+background:#dc2626;
 }
