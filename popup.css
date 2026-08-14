@@ -25,7 +25,7 @@ h1 {
   text-align: center;
   font-size: 1.8rem;
   font-weight: 700;
-  color: #60a5fa;
+  color: #ff9a3c;
 }
 
 .icon-btn{
@@ -45,17 +45,17 @@ h1 {
 
 button{
     border-radius:12px;
-    background:#2563eb;
+    background:#ff7a3c;
     padding:11px;
     font-weight:600;
     color:#f8fafc;
     border:none;
     cursor:pointer;
-    box-shadow: 0 6px 20px rgba(37,99,235,.25);
+    box-shadow: 0 6px 20px rgba(255,122,60,.25);
 }
 
 button:not(.arrow-btn):hover {
-  background: #1d4ed8;
+  background: #e8672a;
 }
 
 button:not(.arrow-btn):active {
@@ -157,7 +157,7 @@ h3 {
 }
 
 .settings-hint-link{
-    color:#60a5fa;
+    color:#ffb26b;
 }
 
 .settings-row{
@@ -177,7 +177,7 @@ h3 {
 }
 
 .settings-row input:focus{
-    outline:2px solid #2563eb;
+    outline:2px solid #ff7a3c;
     outline-offset:1px;
 }
 
@@ -224,7 +224,7 @@ h3 {
 #progressFill{
     width:0%;
     height:100%;
-    background:linear-gradient(90deg,#60a5fa,#2563eb);
+    background:linear-gradient(90deg,#ff5e7e,#ff9a3c,#ffd93d);
     transition:width .3s ease;
 }
 
@@ -256,7 +256,7 @@ h3 {
 }
 
 .arrow-btn:focus-visible{
-    outline:2px solid #2563eb;
+    outline:2px solid #ff7a3c;
     outline-offset:2px;
     border-radius:50%;
 }
@@ -267,25 +267,30 @@ h3 {
 }
 
 #switchBtn{
-    background:#2563eb;
+    background:#ff7a3c;
+    box-shadow: 0 6px 20px rgba(255,122,60,.25);
+}
+
+#switchBtn:hover{
+    background:#e8672a;
 }
 
 #reviewBtn{
-    background:#7c3aed;
-    box-shadow: 0 6px 20px rgba(124,58,237,.25);
+    background:#ff5e7e;
+    box-shadow: 0 6px 20px rgba(255,94,126,.25);
 }
 
 #reviewBtn:hover:not(:disabled){
-    background:#6d28d9;
+    background:#e14766;
 }
 
 #closeBtn{
-    background:#dc2626;
-    box-shadow: 0 6px 20px rgba(220,38,38,.25);
+    background:#ef4444;
+    box-shadow: 0 6px 20px rgba(239,68,68,.25);
 }
 
 #closeBtn:hover{
-    background:#b91c1c;
+    background:#dc2626;
 }
 
 /* ----- AI summary result ----- */
@@ -294,11 +299,11 @@ h3 {
     margin-top:12px;
     padding:12px;
     border-radius:10px;
-    background:#1e1b3a;
-    border:1px solid #4c1d95;
+    background:#2a1620;
+    border:1px solid #9d3a5c;
     font-size:0.85rem;
     line-height:1.45;
-    color:#e9d5ff;
+    color:#fbcfe8;
 }
 
 .ai-summary-box.ai-summary-error{
@@ -309,7 +314,7 @@ h3 {
 
 .ai-badge{
     display:inline-block;
-    background:#7c3aed;
+    background:#ff5e7e;
     color:#fff;
     font-size:0.65rem;
     font-weight:700;
