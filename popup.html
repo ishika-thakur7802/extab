@@ -8,33 +8,42 @@
 </head>
 <body>
 
-<!--    <li>-->
-<!--        <a>-->
-<!--            <h3 class="title">Tab Title</h3>-->
-<!--            <p class="pathname">Tab Pathname</p>-->
-<!--        </a>-->
-<!--    </li>-->
-
-<h1>eXtab</h1>
+<div class="header-row">
+    <h1>eXtab</h1>
+    <button id="settingsBtn" class="icon-btn" type="button" title="Settings" aria-label="Settings">⚙</button>
+</div>
 <p class="subtitle">
     Declutter your browser intelligently.
 </p>
+
+<div id="settingsPanel" class="section settings-panel" hidden>
+    <p class="settings-label">Google AI Studio API Key</p>
+    <p class="settings-hint">
+        Needed for the "Review Tab" AI summary. Free, no credit card required. Stored only on this device and used only to call Google's Gemini API directly from your browser - page titles and a text excerpt of the reviewed tab are sent to Google when you click Review Tab.
+        Get a free key at <span class="settings-hint-link">aistudio.google.com/app/apikey</span>.
+    </p>
+    <div class="settings-row">
+        <input type="password" id="apiKeyInput" placeholder="AIza..." autocomplete="off" />
+        <button id="saveApiKeyBtn" type="button">Save</button>
+    </div>
+    <p id="apiKeyStatus" class="settings-status"></p>
+</div>
+
 <div class="section">
-    <button id="readTabsBtn"> Read Tabs</button>
+    <button id="readTabsBtn" type="button">Read Tabs</button>
     <p id="tabCount"></p>
     <ul id="tabList"></ul>
 </div>
 
 <div class="section">
-    <button id="duplicateTabsBtn"> Find Duplicate Tabs</button>
+    <button id="duplicateTabsBtn" type="button">Find Duplicate Tabs</button>
     <p id="duplicateCount"></p>
     <ul id="duplicateTabsList"></ul>
 </div>
 
-
 <p id="deleteCount"></p>
 <div class="section">
-    <button id="staleTabsBtn"> Show Idle Tabs </button>
+    <button id="staleTabsBtn" type="button">Show Idle Tabs</button>
     <p id="staleCount"></p>
     <div id="progressContainer">
         <p id="progressText"></p>

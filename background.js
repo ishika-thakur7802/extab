@@ -2,38 +2,10 @@ import { readTabs } from './scripts/readTabs.js';
 import { detectDuplicate } from './scripts/detectDuplicate.js';
 import { closeDuplicateTabs } from './scripts/closeDuplicateTabs.js';
 import { detectStaleTabs } from './scripts/detectStaleTabs.js';
+import { initTabActivityTracking, getAdjacentTabActivity } from './scripts/trackTabActivity.js';
+import { extractPageText, generateTabSummary } from './scripts/aiReview.js';
 
-
-
-//initTabActivityTracking();
-
-//// Set up alarm to check for idle tabs every 5 minutes
-//chrome.alarms.create('checkIdleTabs', { periodInMinutes: 5 });
-//
-//// Listen for the alarm
-//chrome.alarms.onAlarm.addListener((alarm) => {
-//  if (alarm.name === 'checkIdleTabs') {
-//    checkAndNotifyIdleTabs();
-//  }
-//});
-//
-//async function checkAndNotifyIdleTabs() {
-//  const idleTabs = await getIdleTabs();
-//
-//  if (idleTabs && idleTabs.length > 0) {
-//    const tabTitles = idleTabs.slice(0, 5).map(t => t.title || 'Untitled').join('\n');
-//    const count = idleTabs.length;
-//    const moreText = count > 5 ? `\n... and ${count - 5} more` : '';
-//
-//    chrome.notifications.create('idleTabsNotification', {
-//      type: 'basic',
-//      iconUrl: 'images/icon-128.png',
-//      title: `${count} Idle Tab${count > 1 ? 's' : ''} Detected`,
-//      message: `These tabs haven't been accessed in 3+ hours:\n${tabTitles}${moreText}`,
-//      priority: 1
-//    });
-//  }
-//}
+initTabActivityTracking();
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
@@ -46,61 +18,60 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true;
   }
 
-   if (request.action === "detectDuplicateTabs") {
+  if (request.action === "detectDuplicateTabs") {
 
-      detectDuplicate().then((duplicateTabs) => {
-        sendResponse({ duplicateTabs });
-      });
+    detectDuplicate().then((duplicateTabs) => {
+      sendResponse({ duplicateTabs });
+    });
 
-      return true;
-    }
+    return true;
+  }
 
-   if (request.action === "closeDuplicateTabs") {
+  if (request.action === "closeDuplicateTabs") {
 
-        closeDuplicateTabs().then((duplicateTabs) => {
-          sendResponse({ duplicateTabs });
-        });
+    closeDuplicateTabs().then((duplicateTabs) => {
+      sendResponse({ duplicateTabs });
+    });
 
-        return true;
+    return true;
+  }
+
+  if (request.action === "getStaleTabs") {
+
+    detectStaleTabs().then((staleTabs) => {
+      sendResponse({ staleTabs });
+    });
+
+    return true;
+  }
+
+  if (request.action === "reviewTab") {
+
+    (async () => {
+      const { tab } = request;
+
+      if (!tab || !tab.id) {
+        sendResponse({ ok: false, error: "invalid_tab" });
+        return;
       }
 
-  if(request.action === "getStaleTabs"){
+      const [pageText, adjacency] = await Promise.all([
+        extractPageText(tab.id),
+        getAdjacentTabActivity(tab.id)
+      ]);
 
-       detectStaleTabs().then((staleTabs)=>{
- 	      sendResponse({staleTabs});
+      const result = await generateTabSummary({
+        tab,
+        pageText,
+        before: adjacency.before,
+        after: adjacency.after,
+        idleTime: tab.idleTime
       });
 
- return true;
- }
+      sendResponse(result);
+    })();
 
- if (request.action === "reviewTab") {
-
-     chrome.scripting.executeScript(
-         {
-             target: {
-                 tabId: request.tabId
-             },
-             files: ["content.js"]
-         },
-         () => {
-
-             chrome.tabs.sendMessage(
-                 request.tabId,
-                 {
-                     action: "extractPage"
-                 },
-                 (response) => {
-
-                     sendResponse(response);
-
-                 }
-             );
-
-         }
-     );
-
-     return true;
- }
-
+    return true;
+  }
 
 });

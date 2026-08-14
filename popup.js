@@ -1,37 +1,66 @@
+import { getStoredApiKey, setStoredApiKey } from './scripts/aiReview.js';
+
 document.addEventListener('DOMContentLoaded', () => {
   const readTabsBtn = document.getElementById('readTabsBtn');
   const duplicateTabsBtn = document.getElementById('duplicateTabsBtn');
-  const staleTabsBtn= document.getElementById('staleTabsBtn');
+  const staleTabsBtn = document.getElementById('staleTabsBtn');
   const tabList = document.getElementById('tabList');
 
   const tabCount = document.getElementById('tabCount');
   const duplicateTabsList = document.getElementById('duplicateTabsList');
   const duplicateCount = document.getElementById('duplicateCount');
   const deleteCount = document.getElementById('deleteCount');
-  const staleCount= document.getElementById('staleCount');
+  const staleCount = document.getElementById('staleCount');
   const staleCardContainer = document.getElementById("staleCardContainer");
-  const progressText= document.getElementById('progressText');
+  const progressText = document.getElementById('progressText');
   const progressFill = document.getElementById("progressFill");
-  const progressContainer= document.getElementById("progressContainer");
+  const progressContainer = document.getElementById("progressContainer");
 
-
+  const settingsBtn = document.getElementById('settingsBtn');
+  const settingsPanel = document.getElementById('settingsPanel');
+  const apiKeyInput = document.getElementById('apiKeyInput');
+  const saveApiKeyBtn = document.getElementById('saveApiKeyBtn');
+  const apiKeyStatus = document.getElementById('apiKeyStatus');
 
   let staleTabs = [];
   let currentIndex = 0;
   progressContainer.style.display = "none";
+
   if (!readTabsBtn || !duplicateTabsBtn || !staleTabsBtn) {
     console.error('Popup missing required elements');
     return;
   }
 
+  // ----- Settings (Gemini API key) -----
 
+  async function refreshApiKeyStatus() {
+    const key = await getStoredApiKey();
+    apiKeyStatus.textContent = key ? '✓ API key saved' : 'No API key saved yet - AI summaries are disabled until you add one.';
+    apiKeyStatus.classList.toggle('status-ok', !!key);
+  }
+
+  settingsBtn.addEventListener('click', () => {
+    settingsPanel.hidden = !settingsPanel.hidden;
+  });
+
+  saveApiKeyBtn.addEventListener('click', async () => {
+    const value = apiKeyInput.value.trim();
+    if (!value) return;
+    await setStoredApiKey(value);
+    apiKeyInput.value = '';
+    refreshApiKeyStatus();
+  });
+
+  refreshApiKeyStatus();
+
+  // ----- Read Tabs -----
 
   readTabsBtn.addEventListener('click', () => {
     chrome.runtime.sendMessage({ action: 'getTabs' }, (response) => {
       if (!response || !Array.isArray(response.tabs)) {
         console.error('No tabs response from background', chrome.runtime.lastError, response);
-        if(tabCount) tabCount.textContent = 'Error reading tabs';
-        if(tabList) tabList.innerHTML = '';
+        if (tabCount) tabCount.textContent = 'Error reading tabs';
+        if (tabList) tabList.innerHTML = '';
         return;
       }
 
@@ -46,10 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-//  readTabsBtn.addEventListener('dblclick', () => {
-//    tabList.innerHTML = '';
-//    tabCount.textContent = '';
-//  }
+  // ----- Duplicate Tabs -----
 
   duplicateTabsBtn.addEventListener('click', () => {
     chrome.runtime.sendMessage({ action: 'detectDuplicateTabs' }, (response) => {
@@ -71,9 +97,9 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // Create delete button
       const deleteDuplicateBtn = document.createElement('button');
       deleteDuplicateBtn.textContent = 'Delete Duplicate Tabs';
+      deleteDuplicateBtn.type = 'button';
       deleteDuplicateBtn.addEventListener('click', () => {
         chrome.runtime.sendMessage({ action: 'closeDuplicateTabs' }, (response) => {
           if (!response || !Array.isArray(response.duplicateTabs)) {
@@ -82,7 +108,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
           }
           deleteCount.textContent = `Duplicate Tabs Deleted: ${response.duplicateTabs.length}`;
-          // Refresh duplicate list UI
           duplicateTabsList.innerHTML = '';
           const li = document.createElement('li');
           li.textContent = `Closed ${response.duplicateTabs.length} tabs`;
@@ -91,172 +116,180 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       duplicateTabsList.appendChild(deleteDuplicateBtn);
 
-      // List duplicates
       response.duplicateTabs.forEach(tab => {
         const li = document.createElement('li');
         li.textContent = tab.title || tab.url || '(no title)';
         duplicateTabsList.appendChild(li);
       });
-
-
     });
   });
+
+  // ----- Idle / Stale Tabs -----
+
+  const AI_ERROR_MESSAGES = {
+    no_api_key: 'Add a free Google AI Studio API key in ⚙ Settings to enable AI summaries.',
+    invalid_api_key: 'Your API key was rejected. Check it in ⚙ Settings.',
+    quota_exceeded: "You've hit the free-tier rate limit for now - wait a minute and try again.",
+    blocked: "Gemini's safety filters blocked this page's content. Try switching to the tab instead.",
+    model_not_found: "The AI model this extension uses may have changed on Google's end - please report this to the developer.",
+    api_error: "Gemini couldn't process this request. Try again in a moment.",
+    network_error: "Couldn't reach Gemini. Check your connection and try again.",
+    empty_response: "AI didn't return a summary. Try again.",
+    invalid_tab: 'This tab is no longer available.'
+  };
 
   function displayCard(tab) {
     const hours = Math.floor(tab.idleTime / 3600000);
     const minutes = Math.floor((tab.idleTime % 3600000) / 60000);
-    progressText.textContent =
-    `${currentIndex + 1} / ${staleTabs.length}`;
-    const progress =
-    ((currentIndex + 1) / staleTabs.length) * 100;
+    progressText.textContent = `${currentIndex + 1} / ${staleTabs.length}`;
+    const progress = ((currentIndex + 1) / staleTabs.length) * 100;
     progressFill.style.width = `${progress}%`;
+
+    let hostname = tab.url;
+    try {
+      hostname = new URL(tab.url).hostname;
+    } catch (e) {
+      // tab.url might not be a standard URL (e.g. chrome://, about:blank) - fall back to raw url
+    }
+
     staleCardContainer.innerHTML = `
     <div class="tab-card">
         <div class="card-nav">
-                <button id="previousBtn" class="arrow-btn">❮</button>
-                <button id="nextBtn" class="arrow-btn">❯</button>
+                <button id="previousBtn" class="arrow-btn" type="button">❮</button>
+                <button id="nextBtn" class="arrow-btn" type="button">❯</button>
             </div>
 
         <h3>${tab.title}</h3>
 
-        <p>${new URL(tab.url).hostname}</p>
+        <p>${hostname}</p>
 
         <p>Idle for ${hours}h ${minutes}m</p>
 
-         <button id="switchBtn">
+         <button id="switchBtn" type="button">
                 Switch To Tab
             </button>
 
-            <button id="reviewBtn">
-                Review Tab
+            <button id="reviewBtn" type="button">
+                ✨ Review Tab
             </button>
 
-            <button id="closeBtn">
+            <button id="closeBtn" type="button">
                 Close Tab
             </button>
 
     </div>
     `;
     const previousBtn = document.getElementById("previousBtn");
-
     const nextBtn = document.getElementById("nextBtn");
-
     const switchBtn = document.getElementById("switchBtn");
-
     const reviewBtn = document.getElementById("reviewBtn");
-
     const closeBtn = document.getElementById("closeBtn");
 
     previousBtn.disabled = currentIndex === 0;
-
     nextBtn.disabled = currentIndex === staleTabs.length - 1;
 
-     nextBtn.addEventListener("click", () => {
+    nextBtn.addEventListener("click", () => {
+      if (currentIndex < staleTabs.length - 1) {
+        currentIndex++;
+        displayCard(staleTabs[currentIndex]);
+      }
+    });
 
-                      if (currentIndex < staleTabs.length - 1) {
-                          currentIndex++;
-                          displayCard(staleTabs[currentIndex]);
-                      }
+    previousBtn.addEventListener("click", () => {
+      if (currentIndex > 0) {
+        currentIndex--;
+        displayCard(staleTabs[currentIndex]);
+      }
+    });
 
-                  });
+    switchBtn.onclick = () => {
+      chrome.tabs.update(tab.id, { active: true });
+    };
 
+    reviewBtn.onclick = () => {
+      reviewBtn.disabled = true;
+      const originalLabel = reviewBtn.textContent;
+      reviewBtn.textContent = 'Analyzing…';
 
-     previousBtn.addEventListener("click", () => {
-
-                      if (currentIndex > 0) {
-                          currentIndex--;
-                          displayCard(staleTabs[currentIndex]);
-                      }
-
-                  });
-
-     switchBtn.onclick = () => {
-
-         chrome.tabs.update(tab.id,{
-             active:true
-         });
-
-     };
-  reviewBtn.onclick = () => {
+      const existingBox = staleCardContainer.querySelector('.ai-summary-box');
+      if (existingBox) existingBox.remove();
 
       chrome.runtime.sendMessage(
-          {
-              action: "reviewTab",
-              tabId: tab.id
-          },
-          (response) => {
+        { action: "reviewTab", tab },
+        (response) => {
+          reviewBtn.disabled = false;
+          reviewBtn.textContent = originalLabel;
 
-              console.log(response.text);
+          const box = document.createElement('div');
+          box.className = 'ai-summary-box';
 
+          if (chrome.runtime.lastError || !response) {
+            box.classList.add('ai-summary-error');
+            box.textContent = 'Something went wrong. Try again.';
+          } else if (!response.ok) {
+            box.classList.add('ai-summary-error');
+            box.textContent = AI_ERROR_MESSAGES[response.error] || "Couldn't generate a summary.";
+          } else {
+            box.innerHTML = `<span class="ai-badge">AI</span> ${response.summary}`;
           }
+
+          const card = staleCardContainer.querySelector('.tab-card');
+          if (card) card.appendChild(box);
+        }
       );
+    };
 
-  };
-     closeBtn.onclick = () => {
+    closeBtn.onclick = () => {
+      chrome.tabs.remove(tab.id);
+      staleTabs.splice(currentIndex, 1);
 
-         chrome.tabs.remove(tab.id);
+      if (staleTabs.length === 0) {
+        progressContainer.style.display = "none";
+        staleCardContainer.innerHTML = `
+            <div class="tab-card">
+                <h3>🎉 All idle tabs reviewed!</h3>
+                <p>No idle tabs left.</p>
+            </div>
+        `;
+        return;
+      }
 
-         staleTabs.splice(currentIndex, 1);
+      if (currentIndex >= staleTabs.length) {
+        currentIndex = staleTabs.length - 1;
+      }
 
-         if (staleTabs.length === 0) {
-
-             progressContainer.style.display = "none";
-
-             staleCardContainer.innerHTML = `
-                 <div class="tab-card">
-                     <h3>🎉 All idle tabs reviewed!</h3>
-                     <p>No idle tabs left.</p>
-                 </div>
-             `;
-
-             return;
-         }
-
-         if (currentIndex >= staleTabs.length) {
-             currentIndex = staleTabs.length - 1;
-         }
-
-         displayCard(staleTabs[currentIndex]);
-     };
+      displayCard(staleTabs[currentIndex]);
+    };
   }
 
-
-
-
-
-  staleTabsBtn.addEventListener('click', ()=>{
-    chrome.runtime.sendMessage({action: 'getStaleTabs'}, (response)=>{
+  staleTabsBtn.addEventListener('click', () => {
+    chrome.runtime.sendMessage({ action: 'getStaleTabs' }, (response) => {
 
       if (!response || !Array.isArray(response.staleTabs)) {
-              console.error('No tabs response from background', chrome.runtime.lastError, response);
-              staleCount.textContent = 'Error reading tabs';
-              staleCardContainer.innerHTML = '';
-              return;
-            }
-    		staleCount.textContent= `Number of Idle Tabs: ${response.staleTabs.length}`;
-    		staleCardContainer.innerHTML = '';
+        console.error('No tabs response from background', chrome.runtime.lastError, response);
+        staleCount.textContent = 'Error reading tabs';
+        staleCardContainer.innerHTML = '';
+        return;
+      }
 
-                  if (response.staleTabs.length === 0) {
-                    progressContainer.style.display = "none";
-                    staleCardContainer.innerHTML = `
-                          <div class="tab-card">
-                              <h3>🎉 No Idle Tabs</h3>
-                              <p>Your tabs are nice and clean.</p>
-                          </div>
-                      `;
-                      return;
-                  }
+      staleCount.textContent = `Number of Idle Tabs: ${response.staleTabs.length}`;
+      staleCardContainer.innerHTML = '';
 
-    staleTabs = response.staleTabs;
-    currentIndex = 0;
-    progressContainer.style.display = "block";
-    displayCard(staleTabs[currentIndex]);
+      if (response.staleTabs.length === 0) {
+        progressContainer.style.display = "none";
+        staleCardContainer.innerHTML = `
+              <div class="tab-card">
+                  <h3>🎉 No Idle Tabs</h3>
+                  <p>Your tabs are nice and clean.</p>
+              </div>
+          `;
+        return;
+      }
 
-//  	const li= document.createElement('li');
-//  	const title= tab.title || tab.url || '(no title)';
-//  	li.textContent= li.textContent = `${title} - Idle for ${Math.floor(tab.idleTime / 86400000)} days ${Math.floor((tab.idleTime % 86400000) / 3600000)} hours`;
-//  	staleTabsList.appendChild(li);
-
+      staleTabs = response.staleTabs;
+      currentIndex = 0;
+      progressContainer.style.display = "block";
+      displayCard(staleTabs[currentIndex]);
     });
-});
+  });
 });
