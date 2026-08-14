@@ -27,10 +27,7 @@
   "permissions": [
     "tabs",
     "storage",
-    "unlimitedStorage",
     "activeTab",
-    "alarms",
-    "notifications",
     "scripting"
 
   ]

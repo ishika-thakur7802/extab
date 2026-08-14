@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </button>
 
             <button id="reviewBtn" type="button">
-                ✨ Review Tab
+                 Review Tab
             </button>
 
             <button id="closeBtn" type="button">
