@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>eXtab Privacy Policy</title>
+<style>
+  body { font-family: Arial, Helvetica, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; line-height: 1.6; color: #1e293b; }
+  h1 { color: #ff7a3c; }
+  h2 { margin-top: 32px; }
+  .updated { color: #64748b; font-size: 0.9rem; }
+</style>
+</head>
+<body>
+
+<h1>eXtab Privacy Policy</h1>
+<p class="updated">Last updated: August 2026</p>
+
+<p>eXtab is a Chrome extension that helps you manage browser tab clutter by detecting duplicate tabs, flagging idle tabs, and optionally generating an AI summary of why you likely opened a given tab. This page explains what data eXtab accesses, how it's used, and what is (and isn't) shared with anyone else.</p>
+
+<h2>What eXtab accesses</h2>
+<p>To do its job, eXtab reads:</p>
+<ul>
+  <li>The titles, URLs, and IDs of your open browser tabs, and how long each has been idle.</li>
+  <li>The visible text content of a specific tab, only when you click "Review Tab" on that tab.</li>
+  <li>The order in which your tabs were opened, so the AI review feature can reference what you opened immediately before/after a given tab.</li>
+</ul>
+
+<h2>Where this data is stored</h2>
+<p>All of the above is stored locally on your device, using Chrome's built-in extension storage. eXtab does not operate a server and does not have a backend database — nothing you do in eXtab is stored anywhere except your own browser.</p>
+
+<h2>What gets sent off your device</h2>
+<p>eXtab only sends data off your device in one situation: when you click "Review Tab" on a tab. At that point, the visible text of that tab (along with the titles/URLs of the tabs opened immediately before and after it) is sent directly from your browser to Google's Gemini API, using an API key that you provide and that is stored only on your device. This request is made to generate the AI summary shown to you. eXtab has no server in between — your data goes straight from your browser to Google, governed by <a href="https://ai.google.dev/gemini-api/terms" target="_blank" rel="noopener">Google's Gemini API terms</a>.</p>
+<p>If you never click "Review Tab," no data ever leaves your device.</p>
+
+<h2>What eXtab does not do</h2>
+<ul>
+  <li>eXtab does not sell, rent, or share your data with any third party.</li>
+  <li>eXtab does not use your data for advertising, profiling, or any purpose unrelated to the tab-management features described above.</li>
+  <li>eXtab does not collect your name, email address, location, financial information, health information, passwords, or personal communications.</li>
+  <li>eXtab does not track your clicks, keystrokes, or activity outside of the open-tabs data described above.</li>
+</ul>
+
+<h2>Your control over this data</h2>
+<p>You can clear eXtab's locally stored data at any time by removing the extension from Chrome, which deletes its local storage. The AI review feature is entirely optional — if you don't add a Gemini API key in eXtab's settings, that feature simply won't work, and no page content is ever sent anywhere.</p>
+
+<h2>Changes to this policy</h2>
+<p>If eXtab's data practices change in a future update, this page will be updated accordingly, and the "Last updated" date above will reflect the change.</p>
+
+<h2>Contact</h2>
+<p>Questions about this policy can be sent to: <em>[your contact email]</em></p>
+
+</body>
+</html>
