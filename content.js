@@ -1,9 +1,7 @@
-// Guard against duplicate registration: this script is both declared as a
-// content script in manifest.json (auto-injected on page load) and
-// manually re-injected on demand by aiReview.js's extractPageText(), as a
-// fallback for tabs that were already open before the extension loaded.
-// Without this guard, repeated manual injection stacks duplicate
-// onMessage listeners on long-lived tabs.
+// This script is injected on demand by aiReview.js when the user
+// explicitly requests an AI review of a tab.
+// The guard prevents duplicate message listeners if the script
+// is injected more than once into the same tab.
 if (!window.__extabContentScriptInjected) {
   window.__extabContentScriptInjected = true;
 
