@@ -1,7 +1,8 @@
 {
   "manifest_version": 3,
   "name": "eXtab",
-  "version": "1.0",
+  "version": "1.1.0",
+  "description": "Find duplicate and idle tabs to reduce browser clutter.",
   "icons": {
     "16": "images/icon-16.png",
     "32": "images/icon-32.png",
@@ -15,20 +16,11 @@
   "action": {
     "default_popup": "popup.html"
   },
-  "host_permissions": [
-    "<all_urls>"
-  ],
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"]
-    }
-  ],
+  "host_permissions": [],
   "permissions": [
     "tabs",
     "storage",
     "activeTab",
     "scripting"
-
   ]
 }
